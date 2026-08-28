@@ -63,6 +63,13 @@ export WEATHERAPI_KEY="your_weatherapi_key"
 uv run python weather.py
 ```
 
+On Windows PowerShell, set the key with:
+
+```powershell
+$env:WEATHERAPI_KEY="your_weatherapi_key"
+uv run python weather.py
+```
+
 The server will be available at `http://localhost:8085/mcp`.
 
 ### 2. ADK Agent (Client)
@@ -79,6 +86,20 @@ uv run adk web
 ```
 
 Open http://localhost:8000 in your browser, select `weather_agent`, and ask about the weather.
+
+### 3. Verify the lab
+
+Keep the MCP server running, then open another terminal:
+
+```powershell
+cd mcp-client
+uv run python verify_setup.py
+uv run adk web
+```
+
+The lab is complete when verification discovers all three tools and the web agent can answer both a current-weather question and a 1–3 day forecast question.
+
+> If `uv` is not yet available on your Windows `PATH`, replace `uv` in the commands above with `python -m uv`.
 
 ## Configuration
 

@@ -25,14 +25,14 @@ async def make_weather_request(endpoint: str, params: dict[str, str]) -> dict[st
     headers = {
         "User-Agent": USER_AGENT,
     }
-    # Add API key to parameters
-    params["key"] = API_KEY
+    # Add the API key without mutating the caller's dictionary.
+    request_params = {**params, "key": API_KEY}
     
     url = f"{WEATHERAPI_BASE}/{endpoint}"
     
     async with httpx.AsyncClient() as client:
         try:
-            response = await client.get(url, headers=headers, params=params, timeout=30.0)
+            response = await client.get(url, headers=headers, params=request_params, timeout=30.0)
             response.raise_for_status()
             return response.json()
         except httpx.HTTPStatusError as e:
@@ -90,8 +90,8 @@ async def get_forecast(city: str, days: int = 3) -> str:
         city: City name (e.g., "Hanoi", "Haiphong", "Danang", "Brisbane", "Sydney", "Melbourne")
         days: Number of days to forecast (1-3 for free tier, max 10 for paid)
     """
-    # Limit days to 3 for free tier
-    days = min(days, 3)
+    # WeatherAPI's free tier accepts forecasts from 1 to 3 days.
+    days = max(1, min(days, 3))
     
     params = {
         "q": city,
@@ -139,14 +139,7 @@ print("✅ MCP server initialized with Streamable HTTP transport")
 print("🔧 Available tools: get_current_weather, get_forecast, health_check")
 
 if __name__ == "__main__":
-    import sys
-    
-    is_cloud_run = bool(os.getenv("PORT"))
-    is_standalone = len(sys.argv) == 1 and sys.stdin.isatty()
-    
-    if is_cloud_run or is_standalone:
-        print(f"🚀 Starting MCP server on http://0.0.0.0:{port}/mcp")
-        mcp.run(transport="streamable-http")
-    else:
-        print("Starting FastMCP server in stdio mode for local client", file=sys.stderr)
-        mcp.run()
+    # This lab demonstrates a remote MCP connection, so direct execution always
+    # starts the Streamable HTTP transport (including non-interactive terminals).
+    print(f"🚀 Starting MCP server on http://0.0.0.0:{port}/mcp")
+    mcp.run(transport="streamable-http")

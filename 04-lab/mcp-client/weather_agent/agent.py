@@ -5,12 +5,13 @@ Successfully connects to custom MCP HTTP endpoints!
 from google.adk import Agent
 from google.adk.tools.mcp_tool.mcp_toolset import McpToolset, StreamableHTTPConnectionParams
 import logging
+import os
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-MCP_SERVER_URL = "http://localhost:8085/mcp"
+MCP_SERVER_URL = os.getenv("MCP_SERVER_URL", "http://localhost:8085/mcp")
 
 logger.info(f"🌐 Initializing weather agent with remote MCP server")
 logger.info(f"📡 MCP Server: {MCP_SERVER_URL}")
@@ -33,13 +34,18 @@ try:
     root_agent = Agent(
         name="weather_agent",
         model="gemini-2.5-flash",
+        description="An assistant that provides current weather and 1-3 day forecasts.",
+        instruction=(
+            "Use the MCP weather tools for weather questions. "
+            "Ask for a city when it is missing, and never invent weather data."
+        ),
         tools=[weather_tools],
     )
     logger.info("✅ Weather agent initialized with remote MCP tools:")
     logger.info("   - get_current_weather(city)")
     logger.info("   - get_forecast(city, days)")
     logger.info("   - health_check()")
-    logger.info("🎉 Remote MCP connection successful!")
+    logger.info("🎉 Remote MCP toolset configuration complete!")
     
 except Exception as e:
     logger.error(f"❌ Failed to connect to remote MCP server: {e}")
@@ -52,5 +58,7 @@ except Exception as e:
     root_agent = Agent(
         name="weather_agent",
         model="gemini-2.5-flash",
+        description="Weather assistant (MCP server unavailable).",
+        instruction="Explain that live weather tools are currently unavailable.",
     )
 

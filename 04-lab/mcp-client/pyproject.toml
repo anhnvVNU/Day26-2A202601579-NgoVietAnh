@@ -1,7 +1,7 @@
 [project]
 name = "mcp-client"
 version = "0.1.0"
-description = "Weather Agent using Google ADK with remote MCP server on Cloud Run"
+description = "Weather Agent using Google ADK with a Streamable HTTP MCP server"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
